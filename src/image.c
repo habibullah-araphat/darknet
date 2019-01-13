@@ -252,7 +252,7 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
                     strcat(labelstr, ", ");
                     strcat(labelstr, names[j]);
                 }
-                printf("%s: %.0f%%\n", names[j], dets[i].prob[j]*100);
+                printf("%s: %.0f%%", names[j], dets[i].prob[j]*100);
             }
         }
         if(class >= 0){
@@ -284,7 +284,21 @@ void draw_detections(image im, detection *dets, int num, float thresh, char **na
             int right = (b.x+b.w/2.)*im.w;
             int top   = (b.y-b.h/2.)*im.h;
             int bot   = (b.y+b.h/2.)*im.h;
-
+            
+            /*
+             * custom code for coordinate printing konok
+             * starts
+             */
+            int k_left_x = left;
+            int k_top_y = top;
+            int k_width = right - left;
+            int k_height = bot - top;
+            printf("   (left_x:  %d   top_y:  %d   width:  %d   height:  %d)\n", k_left_x, k_top_y, k_width, k_height);
+            /*
+             * custom code for coordinate printing konok
+             * end
+             */
+            
             if(left < 0) left = 0;
             if(right > im.w-1) right = im.w-1;
             if(top < 0) top = 0;
