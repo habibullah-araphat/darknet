@@ -28,3 +28,6 @@ Thumbs.db
 
 .kdev4/
 darknet.kdev4
+
+.idea/
+evaluate/test/.pytest_cache/
