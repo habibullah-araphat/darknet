@@ -29,4 +29,5 @@ def get_annotation(binary_path, obj_path, cfg_path, weight_path, img_path):
     darket_command = 'cd {}; ./darknet detector test {} {} {} {} -ext_output'.format(binary_path, obj_path, cfg_path, weight_path, img_path)
     output = subprocess.check_output(darket_command, shell=True, stderr=subprocess.STDOUT)
     decoded_output = output.decode("utf-8")
-    return decoded_output
+    annotations = parse_console_output(decoded_output)
+    return annotations

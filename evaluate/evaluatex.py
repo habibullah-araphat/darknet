@@ -23,8 +23,11 @@ class Evaluatex:
     def get_prediction_dict(self, image_list, names_dict):
         prediction_dict = dict()
         for image in image_list:
+            print(image)
             prediction_dict[image] = yolo_annotations.get_annotation(self.darknet_dir, self.obj_path, self.cfg_path, self.weight_path, image)
-            for idx in range(prediction_dict[image]):
+            for idx in range(len(prediction_dict[image])):
+                print("type idx:", type(idx))
+                print(prediction_dict[image][idx])
                 prediction_dict[image][idx]["class"] = names_dict[prediction_dict[image][idx]["class"]]
         return prediction_dict
 
@@ -37,11 +40,11 @@ class Evaluatex:
 
         actual_dict = self.get_actual_dict(image_list)
         prediction_dict = self.get_prediction_dict(image_list, names_dict)
-        for idx in names_list:
+        for idx in range(len(names_list)):
             cur_ap = ap_calculator.calculate_ap(actual_dict, prediction_dict, idx, 0.5)
             print(names_list[idx], cur_ap)
 
     def __init__(self, config_path):
         self.evaluatex(config_path)
 
-x = Evaluatex("config.ini")
+x = Evaluatex("/home/konok/Desktop/darknet/evaluate/config.ini")

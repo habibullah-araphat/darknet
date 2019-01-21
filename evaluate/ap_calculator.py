@@ -25,12 +25,14 @@ def calculate_ap(actual_dict, prediction_dict, class_name, min_iou=0.5):
     false_pos = 0
     for key, value in prediction_dict.items():
         for cur_row in value:
-            pred_res = find_pred(actual_dict, cur_row, key, min_iou)
-            if pred_res==1:
-                true_pos += 1
-            else:
-                false_pos += 1
-            recall_pres_pairs.append((true_pos/total, true_pos/(true_pos+false_pos)))
+            if cur_row['class']==class_name:
+                pred_res = find_pred(actual_dict, cur_row, key, min_iou)
+                if pred_res==1:
+                    true_pos += 1
+                else:
+                    false_pos += 1
+                print("pred_res:", pred_res, "true_pos:", true_pos, "false_pos:", false_pos, "total:", total)
+                recall_pres_pairs.append((true_pos/total, true_pos/(true_pos+false_pos)))
 
     recall_pres_pairs.sort()
     steps_val = [0.00]*11
