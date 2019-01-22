@@ -1,7 +1,8 @@
 import tempfile, shutil
 import os
 from unittest import TestCase
-from evaluate import read_names
+from evaluate.mAP_utils import read_names
+
 
 class TestLabelNames(TestCase):
     def setUp(self):

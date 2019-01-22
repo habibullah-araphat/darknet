@@ -1,4 +1,5 @@
-from evaluate import iou_calculator
+from evaluate.mAP_utils import iou_calculator
+
 
 def total_occurance(actual_dict, class_name):
     total_cnt = 0
@@ -23,6 +24,8 @@ def calculate_ap(actual_dict, prediction_dict, class_name, min_iou=0.5):
     total = total_occurance(actual_dict, class_name)
     true_pos = 0
     false_pos = 0
+    if total==0:
+        return 0.0
     for key, value in prediction_dict.items():
         for cur_row in value:
             if cur_row['class']==class_name:
@@ -31,7 +34,6 @@ def calculate_ap(actual_dict, prediction_dict, class_name, min_iou=0.5):
                     true_pos += 1
                 else:
                     false_pos += 1
-                print("pred_res:", pred_res, "true_pos:", true_pos, "false_pos:", false_pos, "total:", total)
                 recall_pres_pairs.append((true_pos/total, true_pos/(true_pos+false_pos)))
 
     recall_pres_pairs.sort()

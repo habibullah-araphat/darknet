@@ -1,7 +1,7 @@
 import tempfile, shutil
 from unittest import TestCase
 import os
-from evaluate import image_annotations
+from evaluate.mAP_utils import image_annotations
 from PIL import Image
 
 class TestImageAnnotations(TestCase):
@@ -36,10 +36,10 @@ class TestImageAnnotations(TestCase):
         self.assertEqual(output_height, expected_height, "height didn't match.")
 
     def test_get_annotatoin_dict_should_return_expected_dict(self):
-        input_text = "0    0.555 0.6666 0.20 0.33333333"
+        input_text = "0    0.555 0.6666 0.20 0.40"
         input_width = 100
         input_height = 100
-        expected_dict = {"class": 0, "x": 55, "y": 66, "width": 20, "height": 33}
+        expected_dict = {"class": 0, "x": 45, "y": 46, "width": 20, "height": 40}
 
         output_dict = image_annotations.get_annotatoin_dict(input_text, input_width, input_height)
         self.assertEqual(output_dict, expected_dict)
@@ -47,11 +47,11 @@ class TestImageAnnotations(TestCase):
     def test_get_annotatoins_can_read_appropiate_annotation_list(self):
         input_width = 100
         input_height = 100
-        input_annotation_list = ["0    0.555 0.6666 0.20 0.33333333", "1    0.05 0.09 0.1019999 0.222222222222"]
+        input_annotation_list = ["0    0.555 0.6666 0.20 0.40", "1    0.05 0.07 0.04 0.06"]
 
         expected_annotations = [
-            {"class": 0, "x": 55, "y": 66, "width": 20, "height": 33},
-            {"class": 1, "x": 5, "y": 9, "width": 10, "height": 22}
+            {"class": 0, "x": 45, "y": 46, "width": 20, "height": 40},
+            {"class": 1, "x": 3, "y": 4, "width": 4, "height": 6}
         ]
 
         img_path = os.path.join(self.test_dir, "test.png")

@@ -1,4 +1,4 @@
-from evaluate import load_config
+from evaluate.mAP_utils import load_config
 import tempfile, shutil
 from unittest import TestCase
 import os

@@ -1,6 +1,7 @@
 from PIL import Image
 import os
-from evaluate import read_names
+from evaluate.mAP_utils import read_names
+
 
 def get_dim(img_path):
     with Image.open(img_path) as img:
@@ -13,8 +14,8 @@ def get_annotatoin_dict(input_text, width, height):
     if len(tokens)!=5:
         return res
     res["class"] = int(tokens[0])
-    res["x"] = int(float(tokens[1])*width)
-    res["y"] = int(float(tokens[2])*height)
+    res["x"] = int((float(tokens[1])-float(tokens[3])/2.0)*width)
+    res["y"] = int((float(tokens[2])-float(tokens[4])/2.0)*height)
     res["width"] = int(float(tokens[3])*width)
     res["height"] = int(float(tokens[4])*height)
 

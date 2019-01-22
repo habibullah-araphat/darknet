@@ -1,5 +1,6 @@
 from unittest import TestCase
-from evaluate import iou_calculator
+from evaluate.mAP_utils import iou_calculator
+
 
 class TestIoUCalculator(TestCase):
     def test_seg_intersec_can_detectect_seg_correctly(self):

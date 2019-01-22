@@ -25,9 +25,13 @@ def parse_console_output(text):
             annotations.append(annotation)
     return annotations
 
-def get_annotation(binary_path, obj_path, cfg_path, weight_path, img_path):
-    darket_command = 'cd {}; ./darknet detector test {} {} {} {} -ext_output'.format(binary_path, obj_path, cfg_path, weight_path, img_path)
+def run_binary(binary_path, obj_path, cfg_path, weight_path, img_path):
+    darket_command = 'cd {}; ./darknet detector test {} {} {} {} -ext_output'.format(binary_path, obj_path, cfg_path,
+                                                                                     weight_path, img_path)
     output = subprocess.check_output(darket_command, shell=True, stderr=subprocess.STDOUT)
-    decoded_output = output.decode("utf-8")
-    annotations = parse_console_output(decoded_output)
+    return output.decode('utf-8')
+
+def get_annotation(binary_path, obj_path, cfg_path, weight_path, img_path):
+    output = run_binary(binary_path, obj_path, cfg_path, weight_path, img_path)
+    annotations = parse_console_output(output)
     return annotations

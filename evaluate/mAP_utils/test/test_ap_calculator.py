@@ -1,5 +1,6 @@
 from unittest import TestCase
-from evaluate import ap_calculator
+from evaluate.mAP_utils import ap_calculator
+
 
 class TestAPCalculator(TestCase):
     def setUp(self):
