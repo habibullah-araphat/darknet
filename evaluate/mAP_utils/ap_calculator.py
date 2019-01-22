@@ -41,7 +41,7 @@ def calculate_ap(actual_dict, prediction_dict, class_name, min_iou=0.5):
     steps_idx = 10
     cur_mx = 0.00
     for cur_pair in recall_pres_pairs[::-1]:
-        while steps_idx>=0 and 0.01*steps_idx>cur_pair[0]:
+        while steps_idx>=0 and 0.1*steps_idx>cur_pair[0]:
             steps_val[steps_idx] = cur_mx
             steps_idx -= 1
         cur_mx = max(cur_mx, cur_pair[1])
