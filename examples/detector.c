@@ -69,6 +69,7 @@ void* receive_message_thread(void *inp){
 		/*Receive the message from server*/
 		int read_cnt = recv((socketDescriptor),recv_buffer,sizeof(recv_buffer),0);
 		if(read_cnt<=0){
+            should_continue_training = 0;
 			printf("server disconnected: read_cnt:%d\n", read_cnt);
 			break;
 		}
