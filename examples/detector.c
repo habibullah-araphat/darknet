@@ -68,8 +68,8 @@ void* receive_message_thread(void *inp){
 	while(should_continue_training == 1){
 		/*Receive the message from server*/
 		int read_cnt = recv((socketDescriptor),recv_buffer,sizeof(recv_buffer),0);
-		if(read_cnt<0)continue;
-        if(read_cnt==0){
+        
+        if(read_cnt<=0){
             should_continue_training = 0;
 			printf("server disconnected: read_cnt:%d\n", read_cnt);
 			break;
@@ -96,8 +96,8 @@ int socket_client(){
     
     int port_number = 8808;
     serverAddress.sin_family=AF_INET;
-    // serverAddress.sin_addr.s_addr=inet_addr("127.0.0.1");
-    serverAddress.sin_addr.s_addr=inet_addr("192.168.2.7");
+     serverAddress.sin_addr.s_addr=inet_addr("127.0.0.1");
+    //serverAddress.sin_addr.s_addr=inet_addr("192.168.2.7");
     serverAddress.sin_port=htons(port_number);
     
     /*Creating a socket, assigning IP address and port number for that socket*/
@@ -181,6 +181,8 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
      */
     int socket_descriptor = socket_client();
     printf("socket_descriptor:%d\n", socket_descriptor);
+    char send_buf[15] = "hi there";
+    send(socket_descriptor, send_buf, strlen(send_buf)+1,0);
     /*
      * end konok
      */
