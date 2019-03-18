@@ -267,6 +267,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
             save_weights(net, buff);
         }
+        printf("\n\nshould_continue_training:%d\n\n\n", should_continue_training);
         free_data(train);
     }
 #ifdef GPU
