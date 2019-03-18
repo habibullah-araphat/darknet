@@ -95,7 +95,8 @@ int socket_client(){
     
     int port_number = 8808;
     serverAddress.sin_family=AF_INET;
-    serverAddress.sin_addr.s_addr=inet_addr("127.0.0.1");
+    // serverAddress.sin_addr.s_addr=inet_addr("127.0.0.1");
+    serverAddress.sin_addr.s_addr=inet_addr("192.168.2.7");
     serverAddress.sin_port=htons(port_number);
     
     /*Creating a socket, assigning IP address and port number for that socket*/
