@@ -24,6 +24,17 @@ extern "C" {
 #define SECRET_NUM -1234
 extern int gpu_index;
 
+/*
+ * Konok
+ * For contuniation of training loop
+ * We need to communication withi this variavle from tcp licht and train_detector loop
+ */
+
+/*
+ * konok
+ * End of above section
+ */
+
 typedef struct{
     int classes;
     char **names;

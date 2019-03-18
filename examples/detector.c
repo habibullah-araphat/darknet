@@ -1,6 +1,119 @@
 #include "darknet.h"
+#include<stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <pthread.h>
+//headers for socket and related functions
+#include <sys/types.h>
+#include <sys/socket.h>
+//for including structures which will store information needed
+#include <netinet/in.h>
+#include <unistd.h> // for sleep
+//for gethostbyname
+#include "netdb.h"
+#include "arpa/inet.h"
 
 static int coco_ids[] = {1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,23,24,25,27,28,31,32,33,34,35,36,37,38,39,40,41,42,43,44,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,67,70,72,73,74,75,76,77,78,79,80,81,82,84,85,86,87,88,89,90};
+
+/*
+ * Konok
+ * For initializing socket connection
+ */
+volatile int should_continue_training = 1;
+
+int has_message(char *s){
+    int hash_cnt = 3;
+    int cur_hash_cnt = 0;
+    for(int i=0; s[i]!=0; i++){
+        if(s[i]=='#')cur_hash_cnt++;
+        if(cur_hash_cnt>=hash_cnt)break;
+    }
+    
+    return hash_cnt==cur_hash_cnt;
+}
+
+int next_int(char *s){
+    int num = 0;
+    int idx = 0;
+    while(s[idx]!=0 && (!(s[idx]>='0' && s[idx]<='9'))){
+        idx++;
+    }
+    while(s[idx]!=0 && (s[idx]>='0' && s[idx]<='9')){
+        num *= 10;
+        num += (s[idx]-'0');
+        idx++;
+    }
+    while(s[idx]!=0 && (!(s[idx]>='0' && s[idx]<='9'))){
+        idx++;
+    }
+    int start = 0;
+    while(s[idx]!=0){
+        s[start] = s[idx];
+        start++;
+        idx++;
+    }
+    s[start] = 0;
+    
+    return num;
+}
+
+
+void* receive_message_thread(void *inp){
+	char recv_buffer[1000]={0};
+    char message_buffer[1000] = {0};
+	int *int_pnt = (int*)inp;
+	int socketDescriptor = (*int_pnt);
+	printf("receive message socketDescriptor: %d\n", socketDescriptor);
+	
+	while(should_continue_training == 1){
+		/*Receive the message from server*/
+		int read_cnt = recv((socketDescriptor),recv_buffer,sizeof(recv_buffer),0);
+		if(read_cnt<=0){
+			printf("server disconnected: read_cnt:%d\n", read_cnt);
+			break;
+		}
+		printf("\nSERVER : %s\n",recv_buffer);
+        strncat(message_buffer, recv_buffer, read_cnt+1);
+        recv_buffer[0] = recv_buffer[1] = 0;
+        if(has_message(message_buffer)>0){
+            int msg_type = next_int(message_buffer);
+            int byte_cnt = next_int(message_buffer);
+            int flag_val = next_int(message_buffer);
+            printf("\n\n\nmsg_type:%d byte_cnt:%d, flag_val:%d\n\n\n", msg_type, byte_cnt, flag_val);
+            should_continue_training = flag_val;
+        }
+	}
+	return NULL;
+}
+
+int socket_client(){
+    int socketDescriptor;
+    struct sockaddr_in serverAddress;
+    
+    bzero(&serverAddress,sizeof(serverAddress));
+    
+    int port_number = 8808;
+    serverAddress.sin_family=AF_INET;
+    serverAddress.sin_addr.s_addr=inet_addr("127.0.0.1");
+    serverAddress.sin_port=htons(port_number);
+    
+    /*Creating a socket, assigning IP address and port number for that socket*/
+    socketDescriptor=socket(AF_INET,SOCK_STREAM,0);
+
+    /*Connect establishes connection with the server using server IP address*/
+    connect(socketDescriptor,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+    
+    pthread_t t_receive;
+    if(pthread_create(&t_receive, NULL, receive_message_thread, &socketDescriptor)) {
+		printf("Error creating thread t_receive\n");
+		return -1;
+	}
+
+    return socketDescriptor;
+}
+/*
+ * end konok
+ */
 
 
 void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, int ngpus, int clear)
@@ -58,8 +171,19 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
     pthread_t load_thread = load_data(args);
     double time;
     int count = 0;
+    
+    /*
+     * Konok
+     * initializing threads for tcp connection and controlling training
+     */
+    int socket_descriptor = socket_client();
+    printf("socket_descriptor:%d\n", socket_descriptor);
+    /*
+     * end konok
+     */
+    
     //while(i*imgs < N*120){
-    while(get_current_batch(net) < net->max_batches){
+    while((get_current_batch(net) < net->max_batches) && (should_continue_training==1)){
         if(l.random && count++%10 == 0){
             printf("Resizing\n");
             int dim = (rand() % 10 + 10) * 32;
