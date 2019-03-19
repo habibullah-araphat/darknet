@@ -110,12 +110,6 @@ int socket_client(){
         return -1;
     }
     
-    pthread_t t_receive;
-    if(pthread_create(&t_receive, NULL, receive_message_thread, &socketDescriptor)) {
-		printf("Error creating thread t_receive\n");
-		return -1;
-	}
-
     return socketDescriptor;
 }
 /*
@@ -185,6 +179,12 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
      */
     int socket_descriptor = socket_client();
     printf("socket_descriptor:%d\n", socket_descriptor);
+    pthread_t t_receive;
+    if(pthread_create(&t_receive, NULL, receive_message_thread, &socket_descriptor)) {
+		printf("Error creating thread t_receive\n");
+		return;
+	}
+    
     char send_buf[15] = "hi there";
     send(socket_descriptor, send_buf, strlen(send_buf)+1,0);
     /*
