@@ -25,7 +25,7 @@ int send_all(int socket, void *buffer, int length){
     char *ptr = (char*) buffer;
     while (length > 0)
     {
-        int i = send(socket, ptr, length);
+        int i = send(socket, ptr, length, 0);
         if (i < 1) return 0;
         ptr += i;
         length -= i;
