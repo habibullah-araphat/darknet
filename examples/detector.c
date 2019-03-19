@@ -21,6 +21,18 @@ static int coco_ids[] = {1,2,3,4,5,6,7,8,9,10,11,13,14,15,16,17,18,19,20,21,22,2
  */
 volatile int should_continue_training = 1;
 
+int send_all(int socket, void *buffer, int length){
+    char *ptr = (char*) buffer;
+    while (length > 0)
+    {
+        int i = send(socket, ptr, length);
+        if (i < 1) return 0;
+        ptr += i;
+        length -= i;
+    }
+    return 1;
+}
+
 int has_message(char *s){
     int hash_cnt = 3;
     int cur_hash_cnt = 0;
@@ -286,8 +298,11 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             char buff[256];
             sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
             sprintf(send_buf, "%ld,%f,%f,%s/%s_%d.weights", current_batch_number, loss, avg_loss, backup_directory, base, i);
-            send(socket_descriptor, send_buf, strlen(send_buf),0);
+            
             save_weights(net, buff);
+            
+            // send(socket_descriptor, send_buf, strlen(send_buf),0);
+            send_all(socket_descriptor, send_buf, strlen(send_buf));
         }
         
         
