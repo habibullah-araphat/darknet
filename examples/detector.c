@@ -179,6 +179,9 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
      */
     int socket_descriptor = socket_client();
     printf("socket_descriptor:%d\n", socket_descriptor);
+    if(socket_descriptor<0){
+        return;
+    }
     pthread_t t_receive;
     if(pthread_create(&t_receive, NULL, receive_message_thread, &socket_descriptor)) {
 		printf("Error creating thread t_receive\n");
