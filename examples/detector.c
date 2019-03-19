@@ -61,14 +61,15 @@ int next_int(char *s){
 void* receive_message_thread(void *inp){
 	char recv_buffer[1000]={0};
     char message_buffer[1000] = {0};
-	int *int_pnt = (int*)inp;
-	int socketDescriptor = (*int_pnt);
+	int *sd_ptr = (int*)inp;
+	int socketDescriptor = (*sd_ptr);
 	printf("receive message socketDescriptor: %d\n", socketDescriptor);
 	
 	while(should_continue_training == 1){
 		/*Receive the message from server*/
-		int read_cnt = recv((socketDescriptor),recv_buffer,sizeof(recv_buffer),0);
-        
+		//int read_cnt = recv((socketDescriptor),recv_buffer,sizeof(recv_buffer),0);
+        int read_cnt = read((*sd_ptr), recv_buffer, 255);
+		
         if(read_cnt<=0){
             should_continue_training = 0;
 			printf("server disconnected: read_cnt:%d\n", read_cnt);
@@ -104,7 +105,10 @@ int socket_client(){
     socketDescriptor=socket(AF_INET,SOCK_STREAM,0);
 
     /*Connect establishes connection with the server using server IP address*/
-    connect(socketDescriptor,(struct sockaddr*)&serverAddress,sizeof(serverAddress));
+    if(connect(socketDescriptor,(struct sockaddr*)&serverAddress,sizeof(serverAddress))<0){
+        printf("error while connecting socket.\n");
+        return -1;
+    }
     
     pthread_t t_receive;
     if(pthread_create(&t_receive, NULL, receive_message_thread, &socketDescriptor)) {
