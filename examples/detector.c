@@ -265,7 +265,7 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
         /*
          * Konok custom added
          */
-        long long current_batch_number = get_current_batch(net);
+        long int current_batch_number = get_current_batch(net);
         float current_rate = get_current_rate(net);
         /*
          * konok custom added end
@@ -279,17 +279,18 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             sprintf(buff, "%s/%s.backup", backup_directory, base);
             save_weights(net, buff);
         }
-        if(i%10000==0 || (i < 1000 && i%100 == 0)){
+        if((i%200 == 0)){
 #ifdef GPU
             if(ngpus != 1) sync_nets(nets, ngpus, 0);
 #endif
             char buff[256];
             sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
+            sprintf(send_buf, "%ld,%f,%f,%s/%s_%d.weights", current_batch_number, loss, avg_loss, backup_directory, base, i);
+            send(socket_descriptor, send_buf, strlen(send_buf),0);
             save_weights(net, buff);
         }
         
-        sprintf(send_buf, "%ld,%f,%f,%s/%s_%d.weights", current_batch_number, loss, avg_loss, backup_directory, base, i);
-        send(socket_descriptor, send_buf, strlen(send_buf)+1,0);
+        
         printf("\n\nshould_continue_training:%d\n\n\n", should_continue_training);
         free_data(train);
     }
