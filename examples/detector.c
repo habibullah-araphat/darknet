@@ -117,9 +117,13 @@ int socket_client(){
     socketDescriptor=socket(AF_INET,SOCK_STREAM,0);
 
     /*Connect establishes connection with the server using server IP address*/
-    if(connect(socketDescriptor,(struct sockaddr*)&serverAddress,sizeof(serverAddress))<0){
-        printf("error while connecting socket.\n");
-        return -1;
+    while(1){
+        if(connect(socketDescriptor,(struct sockaddr*)&serverAddress,sizeof(serverAddress))<0){
+            printf("error while connecting socket.\n");
+            sleep(10);
+        }else{
+            break;
+        }
     }
     
     return socketDescriptor;
@@ -296,9 +300,11 @@ void train_detector(char *datacfg, char *cfgfile, char *weightfile, int *gpus, i
             if(ngpus != 1) sync_nets(nets, ngpus, 0);
 #endif
             char buff[256];
+            char tmp_buff[100];
             sprintf(buff, "%s/%s_%d.weights", backup_directory, base, i);
-            sprintf(send_buf, "%ld,%f,%f,%s/%s_%d.weights", current_batch_number, loss, avg_loss, backup_directory, base, i);
-            
+            sprintf(tmp_buff, "%ld,%f,%f,%s/%s_%d.weights", current_batch_number, loss, avg_loss, backup_directory, base, i);
+            int tmp_buff_len = strlen(tmp_buff);
+            sprintf(send_buf, "2#%d#%s#", tmp_buff_len, tmp_buff);
             save_weights(net, buff);
             
             // send(socket_descriptor, send_buf, strlen(send_buf),0);
